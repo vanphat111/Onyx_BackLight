@@ -20,25 +20,56 @@
             android:textStyle="bold"
             android:layout_marginBottom="24dp" />
 
-        <!-- MÀU KHI SẠC -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Charging Color"
+            android:text="Colors by Battery Level (Tap circle to pick)"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="16dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_marginBottom="16dp">
-            <!-- Tái sử dụng bg_circle cho đồng bộ UI -->
-            <View android:id="@+id/chargeRed" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FF0000" android:layout_marginEnd="8dp"/>
-            <View android:id="@+id/chargeGreen" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#00FF00" android:layout_marginEnd="8dp"/>
-            <View android:id="@+id/chargeYellow" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FFFF00" android:layout_marginEnd="8dp"/>
-            <View android:id="@+id/chargeBlue" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#0000FF" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Low Battery (≤ 20%)"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <View
+                android:id="@+id/colorLow"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Charging (21% - 89%)"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <View
+                android:id="@+id/colorMed"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle" />
         </LinearLayout>
 
         <LinearLayout
@@ -48,22 +79,21 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="24dp">
 
-            <Button
-                android:id="@+id/btnPickChargeColor"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bg_surface"
-                android:text="Custom Color" />
+                android:layout_weight="1"
+                android:text="Full Battery (≥ 90%)"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
 
             <View
-                android:id="@+id/viewChargeColorPreview"
+                android:id="@+id/colorFull"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="16dp"
                 android:background="@drawable/bg_circle" />
         </LinearLayout>
 
-        <!-- ĐỘ SÁNG KHI SẠC -->
         <TextView
             android:id="@+id/lblChargeBrightness"
             android:layout_width="wrap_content"
@@ -78,12 +108,10 @@
             android:max="255"
             android:layout_marginBottom="24dp" />
 
-        <!-- NÚT DEMO VÀ TẮT ĐÈN -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnDemoCharge"
@@ -105,6 +133,5 @@
                 android:textColor="@color/text_primary"
                 android:layout_marginStart="4dp"/>
         </LinearLayout>
-
     </LinearLayout>
 </FrameLayout>
