@@ -112,7 +112,6 @@ class NotificationSettingsActivity : AppCompatActivity() {
         val lblBlinkSpeed = findViewById<TextView>(R.id.lblBlinkSpeed)
         val btnReset = findViewById<Button>(R.id.btnResetDefaults)
 
-        // Cập nhật UI từ bộ nhớ
         fun updateAdvancedUI() {
             val count = prefs.getInt("notif_blink_count", 3)
             val speed = prefs.getInt("notif_blink_speed", 400)
@@ -261,6 +260,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
                     led.sendCommand("OFF")
                     Thread.sleep(blinkSpeed)
                 }
+                LedStateManager.restoreBaseState(applicationContext)
             }
         }
     }

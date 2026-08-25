@@ -34,16 +34,7 @@ class OnyxNotificationService : NotificationListenerService() {
             if (powerReceiver == null) {
                 powerReceiver = object : BroadcastReceiver() {
                     override fun onReceive(context: Context?, intent: Intent?) {
-                        when (intent?.action) {
-                            Intent.ACTION_POWER_CONNECTED -> {
-                                Log.d(TAG, "Charger PLUGGED IN")
-                                led.sendCommand("FRAME 0x00FF00 0x00FF00 0x00FF00 0x00FF00")
-                            }
-                            Intent.ACTION_POWER_DISCONNECTED -> {
-                                Log.d(TAG, "Charger UNPLUGGED")
-                                led.sendCommand("OFF")
-                            }
-                        }
+                        context?.let { LedStateManager.restoreBaseState(it) }
                     }
                 }
                 val filter = IntentFilter().apply {
@@ -59,13 +50,14 @@ class OnyxNotificationService : NotificationListenerService() {
                 cameraCallback = object : CameraManager.AvailabilityCallback() {
                     override fun onCameraUnavailable(cameraId: String) {
                         Log.w(TAG, "Camera $cameraId is OPENED! Blocking LED.")
-                        CameraState.isCameraActive = true
-                        led.sendCommand("OFF")
+                        LedStateManager.isCameraBlocking = true
+                        LedStateManager.restoreBaseState(this@OnyxNotificationService)
                     }
 
                     override fun onCameraAvailable(cameraId: String) {
                         Log.d(TAG, "Camera $cameraId is CLOSED. Unblocking LED.")
-                        CameraState.isCameraActive = false
+                        LedStateManager.isCameraBlocking = false
+                        LedStateManager.restoreBaseState(this@OnyxNotificationService)
                     }
                 }
                 cameraManager?.registerAvailabilityCallback(cameraCallback!!, null)
@@ -100,7 +92,7 @@ class OnyxNotificationService : NotificationListenerService() {
         Log.d(TAG, "Service Destroyed")
     }
 
-    override fun onNotificationPosted(sbn: android.service.notification.StatusBarNotification?) {
+    override fun onNotificationPosted(sbn: StatusBarNotification?) {
         val packageName = sbn?.packageName ?: return
 
         val prefs = applicationContext.getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
@@ -118,7 +110,7 @@ class OnyxNotificationService : NotificationListenerService() {
 
         Log.d(TAG, "Target Notification Received from: $packageName | Blinks: $blinkCount | Speed: ${blinkSpeed}ms")
 
-        kotlin.concurrent.thread {
+        thread {
             led.sendCommand("BRIGHTNESS $brightness")
             for (i in 1..blinkCount) {
                 led.sendCommand(colorCommand)
@@ -126,6 +118,7 @@ class OnyxNotificationService : NotificationListenerService() {
                 led.sendCommand("OFF")
                 Thread.sleep(blinkSpeed)
             }
+            LedStateManager.restoreBaseState(applicationContext)
         }
     }
 }

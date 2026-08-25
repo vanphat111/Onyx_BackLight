@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.Switch
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -33,16 +32,26 @@ class MainActivity : AppCompatActivity() {
         switchNotif.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("notif_enabled", isChecked).apply()
             Log.d(TAG, "Notification LED feature status: $isChecked")
+
+            LedStateManager.restoreBaseState(applicationContext)
         }
+
 
         val cardCharging = findViewById<LinearLayout>(R.id.cardChargingFeature)
         val switchCharging = findViewById<Switch>(R.id.switchCharging)
 
+        switchCharging.isChecked = prefs.getBoolean("charging_enabled", false)
+
         cardCharging.setOnClickListener {
+            val intent = android.content.Intent(this, ChargingSettingsActivity::class.java)
+            startActivity(intent)
         }
 
         switchCharging.setOnCheckedChangeListener { _, isChecked ->
-            Log.d(TAG, "Charging Status feature status: $isChecked")
+            prefs.edit().putBoolean("charging_enabled", isChecked).apply()
+            Log.d(TAG, "Charging Status feature: $isChecked")
+
+            LedStateManager.restoreBaseState(applicationContext)
         }
     }
 }

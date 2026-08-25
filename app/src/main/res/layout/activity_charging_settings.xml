@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/app_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Charging LED Settings"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <!-- MÀU KHI SẠC -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Charging Color"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            <!-- Tái sử dụng bg_circle cho đồng bộ UI -->
+            <View android:id="@+id/chargeRed" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FF0000" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/chargeGreen" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#00FF00" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/chargeYellow" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FFFF00" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/chargeBlue" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#0000FF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <Button
+                android:id="@+id/btnPickChargeColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bg_surface"
+                android:text="Custom Color" />
+
+            <View
+                android:id="@+id/viewChargeColorPreview"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_circle" />
+        </LinearLayout>
+
+        <!-- ĐỘ SÁNG KHI SẠC -->
+        <TextView
+            android:id="@+id/lblChargeBrightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Charging Brightness: 128"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <SeekBar
+            android:id="@+id/seekChargeBrightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:layout_marginBottom="24dp" />
+
+        <!-- NÚT DEMO VÀ TẮT ĐÈN -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btnDemoCharge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Demo Effect"
+                android:backgroundTint="@color/led_green"
+                android:textColor="@color/text_primary"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btnTurnOff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Turn Off"
+                android:backgroundTint="@color/led_red"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>
