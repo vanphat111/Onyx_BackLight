@@ -81,7 +81,6 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun enforcePermissionSequence() {
-        // Trạng thái màu
         val colorSuccess = android.graphics.Color.parseColor("#00FF00")
         val colorPending = android.graphics.Color.parseColor("#444444")
         val colorDisabled = android.graphics.Color.parseColor("#1A1A1A")

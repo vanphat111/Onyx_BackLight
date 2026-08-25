@@ -1,53 +1,48 @@
 package vn.vanphat111.onyxbacklight
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.SeekBar
-import androidx.activity.enableEdgeToEdge
+import android.util.Log
+import android.widget.LinearLayout
+import android.widget.Switch
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
+
+    private val TAG = "OnyxLED_Main"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        setupFeatureCards()
+    }
+
+    private fun setupFeatureCards() {
+        val cardNotif = findViewById<LinearLayout>(R.id.cardNotifFeature)
+        val switchNotif = findViewById<Switch>(R.id.switchNotif)
+
+        cardNotif.setOnClickListener {
+            val intent = android.content.Intent(this, NotificationSettingsActivity::class.java)
+            startActivity(intent)
         }
 
-        val led = LedController()
+        val prefs = getSharedPreferences("OnyxPrefs", MODE_PRIVATE)
+        switchNotif.isChecked = prefs.getBoolean("notif_enabled", false)
 
-        // Handle color buttons
-        findViewById<Button>(R.id.btnRed).setOnClickListener {
-            led.sendCommand("FRAME 0xFF0000 0xFF0000 0xFF0000 0xFF0000")
+        switchNotif.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("notif_enabled", isChecked).apply()
+            Log.d(TAG, "Notification LED feature status: $isChecked")
         }
 
-        findViewById<Button>(R.id.btnGreen).setOnClickListener {
-            led.sendCommand("FRAME 0x00FF00 0x00FF00 0x00FF00 0x00FF00")
+        val cardCharging = findViewById<LinearLayout>(R.id.cardChargingFeature)
+        val switchCharging = findViewById<Switch>(R.id.switchCharging)
+
+        cardCharging.setOnClickListener {
         }
 
-        findViewById<Button>(R.id.btnBlue).setOnClickListener {
-            led.sendCommand("FRAME 0x0000FF 0x0000FF 0x0000FF 0x0000FF")
+        switchCharging.setOnCheckedChangeListener { _, isChecked ->
+            Log.d(TAG, "Charging Status feature status: $isChecked")
         }
-
-        findViewById<Button>(R.id.btnOff).setOnClickListener {
-            led.sendCommand("OFF")
-        }
-
-        // Handle brightness slider
-        findViewById<SeekBar>(R.id.seekBrightness).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    led.sendCommand("BRIGHTNESS $progress")
-                }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
     }
 }

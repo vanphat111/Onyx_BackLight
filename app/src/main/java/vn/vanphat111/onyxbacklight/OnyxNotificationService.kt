@@ -100,18 +100,31 @@ class OnyxNotificationService : NotificationListenerService() {
         Log.d(TAG, "Service Destroyed")
     }
 
-    override fun onNotificationPosted(sbn: StatusBarNotification?) {
+    override fun onNotificationPosted(sbn: android.service.notification.StatusBarNotification?) {
         val packageName = sbn?.packageName ?: return
 
-        if (packageName.contains("zalo") || packageName.contains("orca")) {
-            Log.d(TAG, "Target Notification Received from: $packageName")
-            thread {
-                for (i in 1..3) {
-                    led.sendCommand("FRAME 0x00FFFF 0x00FFFF 0x00FFFF 0x00FFFF")
-                    Thread.sleep(400)
-                    led.sendCommand("OFF")
-                    Thread.sleep(400)
-                }
+        val prefs = applicationContext.getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
+
+        val isEnabled = prefs.getBoolean("notif_enabled", false)
+        if (!isEnabled) return
+
+        val allowedApps = prefs.getStringSet("allowed_apps", setOf()) ?: setOf()
+        if (!allowedApps.contains(packageName)) return
+
+        val colorCommand = prefs.getString("notif_color", "FRAME 0x00FFFF 0x00FFFF 0x00FFFF 0x00FFFF") ?: return
+        val brightness = prefs.getInt("notif_brightness", 128)
+        val blinkCount = prefs.getInt("notif_blink_count", 3)
+        val blinkSpeed = prefs.getInt("notif_blink_speed", 400).toLong()
+
+        Log.d(TAG, "Target Notification Received from: $packageName | Blinks: $blinkCount | Speed: ${blinkSpeed}ms")
+
+        kotlin.concurrent.thread {
+            led.sendCommand("BRIGHTNESS $brightness")
+            for (i in 1..blinkCount) {
+                led.sendCommand(colorCommand)
+                Thread.sleep(blinkSpeed)
+                led.sendCommand("OFF")
+                Thread.sleep(blinkSpeed)
             }
         }
     }

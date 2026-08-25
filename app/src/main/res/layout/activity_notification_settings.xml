@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/app_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notification LED Settings"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LED Color Presets"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <View android:id="@+id/preRed" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FF0000" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/preGreen" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#00FF00" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/preBlue" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#0000FF" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/preCyan" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#00FFFF" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/prePink" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FF00FF" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/preYellow" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FFFF00" android:layout_marginEnd="8dp"/>
+            <View android:id="@+id/preWhite" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle" android:backgroundTint="#FFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnPickColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bg_surface"
+                android:text="Choose Custom Color"
+                android:textColor="@color/text_primary"/>
+
+            <View
+                android:id="@+id/viewColorPreview"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_circle" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lblBrightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LED Brightness: 128"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <SeekBar
+            android:id="@+id/seekBarBrightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/lblBlinkCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blink Count: 3 times"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <SeekBar
+            android:id="@+id/seekBlinkCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="9"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/lblBlinkSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blink Speed (Delay): 400ms"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        <SeekBar
+            android:id="@+id/seekBlinkSpeed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="38"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnDemoEffect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Demo Effect"
+                android:backgroundTint="@color/led_blue"
+                android:textColor="@color/text_primary"
+                android:layout_marginEnd="4dp"/>
+
+            <Button
+                android:id="@+id/btnResetDefaults"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Reset Defaults"
+                android:backgroundTint="@color/border_subtle"
+                android:textColor="@color/text_primary"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cbShowSystemApps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show System Apps"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Allowed Apps"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/listViewApps"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@color/border_subtle"
+            android:dividerHeight="1dp" />
+
+    </LinearLayout>
+
+</FrameLayout>
