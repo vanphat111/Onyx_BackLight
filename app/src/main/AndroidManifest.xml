@@ -38,6 +38,10 @@
             android:name=".ChargingSettingsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".CallSettingsActivity"
+            android:exported="false" />
+
         <service android:name=".OnyxNotificationService"
             android:label="Onyx LED Notifier"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"

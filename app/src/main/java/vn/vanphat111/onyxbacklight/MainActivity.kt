@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +32,10 @@ class MainActivity : AppCompatActivity() {
                 ColorWaveAnimator.stop(applicationContext)
             }
             updateWaveButtonState(btnRgbWave)
+        }
+
+        findViewById<Button>(R.id.btnCallSettings).setOnClickListener {
+            startActivity(Intent(this, CallSettingsActivity::class.java))
         }
     }
 

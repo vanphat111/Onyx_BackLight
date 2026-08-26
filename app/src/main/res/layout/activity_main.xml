@@ -103,16 +103,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+
         <Button
             android:id="@+id/btnRgbWaveToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="🌀 Enable RGB wave"
-            android:backgroundTint="#2D3250"
-            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"
+            android:text="🌀 Enable RGB Wave"
+            android:backgroundTint="@color/bg_surface"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
-            style="?attr/materialButtonOutlinedStyle" />
+            android:gravity="start|center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+        <Button
+            android:id="@+id/btnCallSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Incoming Call LED Settings"
+            android:backgroundTint="@color/bg_surface"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
 
     </LinearLayout>
 </FrameLayout>

@@ -21,26 +21,18 @@ object CallLedAnimator {
             }
 
             val led = LedController()
-
             val brightness = prefs.getInt("call_brightness", 255)
             val speedMs = prefs.getInt("call_flash_speed", 150)
 
             val frame1 = prefs.getString("call_frame_1", "FRAME 0xFF0000 0xFF0000 0x000000 0x000000")!!
             val frame2 = prefs.getString("call_frame_2", "FRAME 0x000000 0x000000 0x0000FF 0x0000FF")!!
 
-            led.sendCommand("RUN 0")
-            led.sendCommand("EFFECT 0")
-            led.sendCommand("TRIGGER none")
+            led.resetForStatic()
             led.sendCommand("BRIGHTNESS $brightness")
 
             var toggle = true
-
             while (isRinging) {
-                if (toggle) {
-                    led.sendCommand(frame1)
-                } else {
-                    led.sendCommand(frame2)
-                }
+                led.sendCommand(if (toggle) frame1 else frame2)
                 toggle = !toggle
 
                 try {

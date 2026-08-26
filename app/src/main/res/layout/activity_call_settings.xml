@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#1E1E2E">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Incoming Call LED Settings"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Công tắc bật/tắt -->
+    <Switch
+        android:id="@+id/switchCallLed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable Flash on Ring"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Tốc độ chớp -->
+    <TextView
+        android:id="@+id/tvSpeedVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flash Speed: 150 ms"
+        android:textColor="#AAAAAA"
+        android:layout_marginBottom="8dp"/>
+    <SeekBar
+        android:id="@+id/seekSpeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="1000"
+        android:min="50"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Độ sáng -->
+    <TextView
+        android:id="@+id/tvBrightVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brightness: 255"
+        android:textColor="#AAAAAA"
+        android:layout_marginBottom="8dp"/>
+    <SeekBar
+        android:id="@+id/seekBrightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="255"
+        android:min="10"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Lệnh nhịp 1 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Frame 1 Command (e.g. Red Flash)"
+        android:textColor="#AAAAAA"/>
+    <EditText
+        android:id="@+id/edtFrame1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#888888"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Lệnh nhịp 2 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Frame 2 Command (e.g. Blue Flash)"
+        android:textColor="#AAAAAA"/>
+    <EditText
+        android:id="@+id/edtFrame2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#888888"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Nút Demo LED -->
+    <Button
+        android:id="@+id/btnDemoCall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test / Demo Flash (3s)"
+        android:backgroundTint="#FF6AC1"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>
