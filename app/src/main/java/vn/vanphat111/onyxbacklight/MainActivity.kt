@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupFeatureCards()
+        val btnRgbWave = findViewById<Button>(R.id.btnRgbWaveToggle)
+
+        updateWaveButtonState(btnRgbWave)
+
+        btnRgbWave.setOnClickListener {
+            if (!ColorWaveAnimator.isWaveActive()) {
+                ColorWaveAnimator.start(applicationContext)
+            } else {
+                ColorWaveAnimator.stop(applicationContext)
+            }
+            updateWaveButtonState(btnRgbWave)
+        }
     }
 
     private fun setupFeatureCards() {
@@ -52,6 +65,22 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "Charging Status feature: $isChecked")
 
             LedStateManager.restoreBaseState(applicationContext)
+        }
+    }
+    private fun updateWaveButtonState(button: Button) {
+        if (ColorWaveAnimator.isWaveActive()) {
+            button.text = "Disable RGB wave"
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#B31312")))
+        } else {
+            button.text = "🌀 Enable RGB wave"
+            button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2D3250")))
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) {
+            ColorWaveAnimator.stop(applicationContext)
         }
     }
 }

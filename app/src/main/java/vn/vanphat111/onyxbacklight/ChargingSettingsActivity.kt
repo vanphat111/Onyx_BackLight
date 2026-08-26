@@ -20,61 +20,80 @@ class ChargingSettingsActivity : AppCompatActivity() {
 
         prefs = getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
 
-        setupColors()
+        setupLedStage("Low", listOf(R.id.low1, R.id.low2, R.id.low3, R.id.low4), "low", "charge_low_cmd", "0xFF0000") // Mặc định Đỏ
+        setupLedStage("Medium", listOf(R.id.med1, R.id.med2, R.id.med3, R.id.med4), "med", "charge_med_cmd", "0xFFFF00") // Mặc định Vàng
+        setupLedStage("Full", listOf(R.id.full1, R.id.full2, R.id.full3, R.id.full4), "full", "charge_full_cmd", "0x00FF00") // Mặc định Xanh Lá
+
         setupBrightnessControl()
         setupActionButtons()
     }
 
-    private fun setupColors() {
-        val viewLow = findViewById<View>(R.id.colorLow)
-        val viewMed = findViewById<View>(R.id.colorMed)
-        val viewFull = findViewById<View>(R.id.colorFull)
+    private fun parseHex(hex: String): Int {
+        return try {
+            android.graphics.Color.parseColor(hex.replace("0x", "#"))
+        } catch (e: Exception) {
+            android.graphics.Color.WHITE
+        }
+    }
 
-        val colorLow = prefs.getInt("charge_low_color", android.graphics.Color.RED)
-        val colorMed = prefs.getInt("charge_med_color", android.graphics.Color.YELLOW)
-        val colorFull = prefs.getInt("charge_full_color", android.graphics.Color.GREEN)
+    private fun setupLedStage(
+        stageName: String,
+        viewIds: List<Int>,
+        prefPrefix: String,
+        cmdPrefKey: String,
+        defaultHex: String
+    ) {
+        val colors = Array(4) { i -> prefs.getString("charge_${prefPrefix}_c${i+1}", defaultHex)!! }
 
-        viewLow.backgroundTintList = android.content.res.ColorStateList.valueOf(colorLow)
-        viewMed.backgroundTintList = android.content.res.ColorStateList.valueOf(colorMed)
-        viewFull.backgroundTintList = android.content.res.ColorStateList.valueOf(colorFull)
+        fun updateUIAndHardware() {
+            for (i in 0..3) {
+                val view = findViewById<View>(viewIds[i])
+                view.backgroundTintList = android.content.res.ColorStateList.valueOf(parseHex(colors[i]))
+            }
 
-        fun openPicker(title: String, prefKeyCmd: String, prefKeyColor: String, targetView: View) {
-            ColorPickerDialog.Builder(this)
-                .setTitle(title)
-                .setPreferenceName(prefKeyColor)
-                .setPositiveButton("Select", ColorEnvelopeListener { envelope, _ ->
-                    val c = envelope.color
-                    val r = android.graphics.Color.red(c)
-                    val g = android.graphics.Color.green(c)
-                    val b = android.graphics.Color.blue(c)
+            val cmd = "FRAME ${colors[0]} ${colors[1]} ${colors[2]} ${colors[3]}"
 
-                    val hex = String.format("0x%02X%02X%02X", r, g, b)
-                    val cmd = "FRAME $hex $hex $hex $hex"
+            prefs.edit().apply {
+                putString("charge_${prefPrefix}_c1", colors[0])
+                putString("charge_${prefPrefix}_c2", colors[1])
+                putString("charge_${prefPrefix}_c3", colors[2])
+                putString("charge_${prefPrefix}_c4", colors[3])
+                putString(cmdPrefKey, cmd)
+                apply()
+            }
 
-                    prefs.edit()
-                        .putInt(prefKeyColor, c)
-                        .putString(prefKeyCmd, cmd)
-                        .apply()
-
-                    targetView.backgroundTintList = android.content.res.ColorStateList.valueOf(c)
-
-                    val led = LedController()
-                    val brightness = prefs.getInt("charging_brightness", 128)
-                    kotlin.concurrent.thread {
-                        led.sendCommand("BRIGHTNESS $brightness")
-                        led.sendCommand(cmd)
-                    }
-                })
-                .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-                .attachAlphaSlideBar(false)
-                .attachBrightnessSlideBar(true)
-                .setBottomSpace(12)
-                .show()
+            val brightness = prefs.getInt("charging_brightness", 128)
+            kotlin.concurrent.thread {
+                LedController().sendCommand("BRIGHTNESS $brightness")
+                LedController().sendCommand(cmd)
+            }
         }
 
-        viewLow.setOnClickListener { openPicker("Low Battery Color", "charge_low_cmd", "charge_low_color", viewLow) }
-        viewMed.setOnClickListener { openPicker("Charging Color", "charge_med_cmd", "charge_med_color", viewMed) }
-        viewFull.setOnClickListener { openPicker("Full Battery Color", "charge_full_cmd", "charge_full_color", viewFull) }
+        for (i in 0..3) {
+            val view = findViewById<View>(viewIds[i])
+            view.backgroundTintList = android.content.res.ColorStateList.valueOf(parseHex(colors[i]))
+
+            view.setOnClickListener {
+                ColorPickerDialog.Builder(this)
+                    .setTitle("$stageName - LED ${i+1}")
+                    .setPreferenceName("ColorPicker_${prefPrefix}_$i")
+                    .setPositiveButton("Select", ColorEnvelopeListener { envelope, _ ->
+                        val c = envelope.color
+                        val hex = String.format("0x%02X%02X%02X",
+                            android.graphics.Color.red(c),
+                            android.graphics.Color.green(c),
+                            android.graphics.Color.blue(c))
+
+                        colors[i] = hex
+                        updateUIAndHardware()
+                    })
+                    .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+                    .attachAlphaSlideBar(false)
+                    .attachBrightnessSlideBar(true)
+                    .setBottomSpace(12)
+                    .show()
+            }
+        }
     }
 
     private fun setupBrightnessControl() {
@@ -100,7 +119,65 @@ class ChargingSettingsActivity : AppCompatActivity() {
 
     private fun setupActionButtons() {
         findViewById<Button>(R.id.btnDemoCharge).setOnClickListener {
-            LedStateManager.restoreBaseState(applicationContext)
+            (it as Button).text = "Running Color Wave..."
+
+            kotlin.concurrent.thread {
+                val led = LedController()
+                led.sendCommand("BRIGHTNESS 200")
+
+                val colors = listOf(
+                    0xFF0000,
+                    0xFFFF00,
+                    0x00FF00,
+                    0x00FFFF,
+                    0x0000FF,
+                    0xFF00FF,
+                    0xFF0000
+                )
+
+                fun interpolateColor(c1: Int, c2: Int, fraction: Float): Int {
+                    val r1 = (c1 shr 16) and 0xFF
+                    val g1 = (c1 shr 8) and 0xFF
+                    val b1 = c1 and 0xFF
+                    val r2 = (c2 shr 16) and 0xFF
+                    val g2 = (c2 shr 8) and 0xFF
+                    val b2 = c2 and 0xFF
+                    val r = (r1 + (fraction * (r2 - r1))).toInt()
+                    val g = (g1 + (fraction * (g2 - g1))).toInt()
+                    val b = (b1 + (fraction * (b2 - b1))).toInt()
+                    return (r shl 16) or (g shl 8) or b
+                }
+
+                fun toHex(c: Int): String = String.format("0x%06X", c)
+
+                fun getColorAt(pos: Float): Int {
+                    val safePos = pos % (colors.size - 1)
+                    val idx = safePos.toInt().coerceIn(0, colors.size - 2)
+                    val frac = safePos - idx
+                    return interpolateColor(colors[idx], colors[idx + 1], frac)
+                }
+
+                val totalSteps = 150
+                for (step in 0..totalSteps) {
+                    val baseProgress = step.toFloat() / 25f
+
+                    val p1 = baseProgress
+                    val p2 = baseProgress + 0.25f
+                    val p3 = baseProgress + 0.50f
+                    val p4 = baseProgress + 0.75f
+
+                    val hex1 = toHex(getColorAt(p1))
+                    val hex2 = toHex(getColorAt(p2))
+                    val hex3 = toHex(getColorAt(p3))
+                    val hex4 = toHex(getColorAt(p4))
+
+                    led.sendCommand("FRAME $hex1 $hex2 $hex3 $hex4")
+                    Thread.sleep(30)
+                }
+
+                runOnUiThread { it.text = "Demo Effect" }
+                LedStateManager.restoreBaseState(applicationContext)
+            }
         }
 
         findViewById<Button>(R.id.btnTurnOff).setOnClickListener {

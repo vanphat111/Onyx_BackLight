@@ -103,6 +103,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+        <Button
+            android:id="@+id/btnRgbWaveToggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="🌀 Enable RGB wave"
+            android:backgroundTint="#2D3250"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            style="?attr/materialButtonOutlinedStyle" />
 
     </LinearLayout>
 </FrameLayout>
