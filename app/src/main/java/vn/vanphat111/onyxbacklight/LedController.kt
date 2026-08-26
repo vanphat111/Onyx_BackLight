@@ -17,7 +17,25 @@ class LedController {
         val suLock = Any()
     }
 
+    fun resetForStatic() {
+        sendCommand("RUN 0")
+        sendCommand("EFFECT 0")
+        sendCommand("TRIGGER none")
+    }
+
+    fun resetAndOff() {
+        resetForStatic()
+        sendCommand("OFF")
+    }
+
     fun sendCommand(cmd: String): Boolean {
+        val targetCmd = if (LedStateManager.isCameraBlocking) {
+            val allowedCommands = listOf("OFF", "RUN 0", "EFFECT 0", "TRIGGER none")
+            if (cmd !in allowedCommands) "OFF" else cmd
+        } else {
+            cmd
+        }
+
         var socket: LocalSocket? = null
         var out: OutputStream? = null
         var input: InputStream? = null
@@ -36,7 +54,7 @@ class LedController {
             out = socket.outputStream
             input = socket.inputStream
 
-            out.write("$cmd\n".toByteArray())
+            out.write("$targetCmd\n".toByteArray())
             out.flush()
 
             val buffer = ByteArray(16)
@@ -48,7 +66,7 @@ class LedController {
                 }
             }
         } catch (e: Exception) {
-             e.printStackTrace()
+            e.printStackTrace()
         } finally {
             input?.close()
             out?.close()
