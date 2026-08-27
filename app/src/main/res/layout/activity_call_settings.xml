@@ -1,99 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:background="#1E1E2E">
+    android:background="@color/bg_main"
+    android:fitsSystemWindows="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Incoming Call LED Settings"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- Công tắc bật/tắt -->
-    <Switch
-        android:id="@+id/switchCallLed"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enable Flash on Ring"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <!-- Tốc độ chớp -->
-    <TextView
-        android:id="@+id/tvSpeedVal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Flash Speed: 150 ms"
-        android:textColor="#AAAAAA"
-        android:layout_marginBottom="8dp"/>
-    <SeekBar
-        android:id="@+id/seekSpeed"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="1000"
-        android:min="50"
-        android:layout_marginBottom="20dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/app_padding">
 
-    <!-- Độ sáng -->
-    <TextView
-        android:id="@+id/tvBrightVal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Brightness: 255"
-        android:textColor="#AAAAAA"
-        android:layout_marginBottom="8dp"/>
-    <SeekBar
-        android:id="@+id/seekBrightness"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="255"
-        android:min="10"
-        android:layout_marginBottom="20dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Incoming Call LED Settings"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
-    <!-- Lệnh nhịp 1 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Frame 1 Command (e.g. Red Flash)"
-        android:textColor="#AAAAAA"/>
-    <EditText
-        android:id="@+id/edtFrame1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#888888"
-        android:layout_marginBottom="16dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap any circle to customize LED frame colors"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
 
-    <!-- Lệnh nhịp 2 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Frame 2 Command (e.g. Blue Flash)"
-        android:textColor="#AAAAAA"/>
-    <EditText
-        android:id="@+id/edtFrame2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#888888"
-        android:layout_marginBottom="24dp"/>
+            <!-- Switch On/Off -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
 
-    <!-- Nút Demo LED -->
-    <Button
-        android:id="@+id/btnDemoCall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Test / Demo Flash (3s)"
-        android:backgroundTint="#FF6AC1"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Enable Flash on Ring"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp" />
 
-</LinearLayout>
+                <Switch
+                    android:id="@+id/switchCallLed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- Speed SeekBar -->
+            <TextView
+                android:id="@+id/tvSpeedVal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Flash Speed: 150 ms"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <SeekBar
+                android:id="@+id/seekSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:min="50"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Brightness SeekBar -->
+            <TextView
+                android:id="@+id/tvBrightVal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Call Brightness: 255"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <SeekBar
+                android:id="@+id/seekBrightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="255"
+                android:min="10"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Frame 1 LEDs -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Frame 1 (Beat 1)"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <View android:id="@+id/f1_led1" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f1_led2" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f1_led3" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f1_led4" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" />
+            </LinearLayout>
+
+            <!-- Frame 2 LEDs -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Frame 2 (Beat 2)"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+                <View android:id="@+id/f2_led1" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f2_led2" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f2_led3" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" android:layout_marginEnd="12dp"/>
+                <View android:id="@+id/f2_led4" android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_circle" />
+            </LinearLayout>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnDemoCall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Demo Effect"
+                    android:backgroundTint="@color/led_green"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btnTurnOff"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Stop Demo"
+                    android:backgroundTint="@color/led_red"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

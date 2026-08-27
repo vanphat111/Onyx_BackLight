@@ -1,10 +1,12 @@
 package vn.vanphat111.onyxbacklight
 
+import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -16,6 +18,7 @@ class OnyxNotificationService : NotificationListenerService() {
     private var powerReceiver: BroadcastReceiver? = null
     private var cameraManager: CameraManager? = null
     private var cameraCallback: CameraManager.AvailabilityCallback? = null
+    private val activeCallKeys = mutableSetOf<String>()
 
     override fun onListenerConnected() {
         super.onListenerConnected()
@@ -93,8 +96,31 @@ class OnyxNotificationService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        val packageName = sbn?.packageName ?: return
+        if (sbn == null) return
+        val notif = sbn.notification ?: return
 
+        val isCall = isGenericIncomingCall(sbn)
+        Log.d(TAG, "Notif received from: ${sbn.packageName} | Category: ${notif.category} | isCall: $isCall")
+
+        if (isCall) {
+            Log.d(TAG, ">>> INCOMING CALL DETECTED! Starting LED Animator...")
+            activeCallKeys.add(sbn.key)
+            CallLedAnimator.start(applicationContext)
+            return
+        }
+
+        if (activeCallKeys.contains(sbn.key) && !isCall) {
+            Log.d(TAG, ">>> CALL ANSWERED / ENDED! Stopping LED Animator...")
+            activeCallKeys.remove(sbn.key)
+            if (activeCallKeys.isEmpty()) {
+                CallLedAnimator.stop(applicationContext)
+            }
+            return
+        }
+
+        if (CallLedAnimator.isRinging) return
+
+        val packageName = sbn.packageName
         val prefs = applicationContext.getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
 
         val isEnabled = prefs.getBoolean("notif_enabled", false)
@@ -113,12 +139,50 @@ class OnyxNotificationService : NotificationListenerService() {
         thread {
             led.sendCommand("BRIGHTNESS $brightness")
             for (i in 1..blinkCount) {
+                if (CallLedAnimator.isRinging) break
                 led.sendCommand(colorCommand)
                 Thread.sleep(blinkSpeed)
                 led.sendCommand("OFF")
                 Thread.sleep(blinkSpeed)
             }
-            LedStateManager.restoreBaseState(applicationContext)
+            if (!CallLedAnimator.isRinging) {
+                LedStateManager.restoreBaseState(applicationContext)
+            }
         }
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        if (sbn == null) return
+        if (activeCallKeys.remove(sbn.key)) {
+            if (activeCallKeys.isEmpty()) {
+                CallLedAnimator.stop(applicationContext)
+            }
+        }
+    }
+
+    private fun isGenericIncomingCall(sbn: StatusBarNotification): Boolean {
+        val notif = sbn.notification ?: return false
+        val extras = notif.extras ?: return false
+
+        val template = extras.getString(Notification.EXTRA_TEMPLATE) ?: ""
+        if (template.contains("CallStyle", ignoreCase = true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val callType = extras.getInt(Notification.EXTRA_CALL_TYPE, -1)
+                if (callType == Notification.CallStyle.CALL_TYPE_INCOMING) {
+                    return true
+                } else if (callType == Notification.CallStyle.CALL_TYPE_ONGOING) {
+                    return false
+                }
+            } else {
+                return true
+            }
+        }
+
+        val isCallCategory = notif.category == Notification.CATEGORY_CALL
+        val isOngoing = (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0
+        val isInsistent = (notif.flags and Notification.FLAG_INSISTENT) != 0
+        val hasFullScreenIntent = notif.fullScreenIntent != null
+
+        return isCallCategory && (hasFullScreenIntent || isInsistent || isOngoing)
     }
 }

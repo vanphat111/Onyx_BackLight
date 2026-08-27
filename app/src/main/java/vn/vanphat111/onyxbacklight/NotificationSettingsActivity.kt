@@ -10,6 +10,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import android.app.Notification
+import android.os.Build
+import android.service.notification.StatusBarNotification
 
 class NotificationSettingsActivity : AppCompatActivity() {
 
@@ -263,5 +266,31 @@ class NotificationSettingsActivity : AppCompatActivity() {
                 LedStateManager.restoreBaseState(applicationContext)
             }
         }
+    }
+
+    private fun isGenericIncomingCall(sbn: StatusBarNotification): Boolean {
+        val notif = sbn.notification ?: return false
+        val extras = notif.extras ?: return false
+
+        val template = extras.getString(Notification.EXTRA_TEMPLATE) ?: ""
+        if (template.contains("CallStyle", ignoreCase = true)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val callType = extras.getInt(Notification.EXTRA_CALL_TYPE, -1)
+                if (callType == Notification.CallStyle.CALL_TYPE_INCOMING) {
+                    return true
+                }
+            } else {
+                return true
+            }
+        }
+
+        val isCallCategory = notif.category == Notification.CATEGORY_CALL
+
+        val isOngoing = (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0
+        val isInsistent = (notif.flags and Notification.FLAG_INSISTENT) != 0
+
+        val hasFullScreenIntent = notif.fullScreenIntent != null
+
+        return isCallCategory && (hasFullScreenIntent || isInsistent || isOngoing)
     }
 }
