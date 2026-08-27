@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.SeekBar
@@ -14,7 +15,7 @@ import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
 class CallSettingsActivity : AppCompatActivity() {
-
+    private val TAG = "OnyxLED_CallSettings"
     private val frame1Colors = IntArray(4) { Color.RED }
     private val frame2Colors = IntArray(4) { Color.BLUE }
 
@@ -83,13 +84,17 @@ class CallSettingsActivity : AppCompatActivity() {
         }
 
         switchEnable.setOnCheckedChangeListener { _, isChecked ->
+            Log.d(TAG, "Call LED Enabled Toggled: $isChecked")
             prefs.edit().putBoolean("call_led_enabled", isChecked).apply()
         }
 
         seekSpeed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 tvSpeedVal.text = "Flash Speed: $progress ms"
-                prefs.edit().putInt("call_flash_speed", progress).apply()
+                if (fromUser) {
+                    Log.d(TAG, "Speed Changed: $progress ms")
+                    prefs.edit().putInt("call_flash_speed", progress).apply()
+                }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -98,17 +103,22 @@ class CallSettingsActivity : AppCompatActivity() {
         seekBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 tvBrightVal.text = "Call Brightness: $progress"
-                prefs.edit().putInt("call_brightness", progress).apply()
+                if (fromUser) {
+                    Log.d(TAG, "Brightness Changed: $progress")
+                    prefs.edit().putInt("call_brightness", progress).apply()
+                }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         btnDemoCall.setOnClickListener {
+            Log.d(TAG, "Demo Call Button Clicked")
             CallLedAnimator.start(this)
         }
 
         btnTurnOff.setOnClickListener {
+            Log.d(TAG, "Turn Off Button Clicked")
             CallLedAnimator.stop(this)
         }
     }
@@ -137,6 +147,7 @@ class CallSettingsActivity : AppCompatActivity() {
                 append(" 0x$hex")
             }
         }
+        Log.d(TAG, "Saved $key: $cmd")
         getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
             .edit()
             .putString(key, cmd)

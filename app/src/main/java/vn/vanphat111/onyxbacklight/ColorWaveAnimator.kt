@@ -1,15 +1,18 @@
 package vn.vanphat111.onyxbacklight
 
 import android.content.Context
+import android.util.Log
 import kotlin.concurrent.thread
 
 object ColorWaveAnimator {
+    private const val TAG = "OnyxLED_Wave"
     private var waveThread: Thread? = null
     @Volatile private var isRunning = false
 
     fun start(context: Context) {
         if (isRunning) return
         isRunning = true
+        Log.d(TAG, "RGB Wave Started")
 
         waveThread = thread(start = true) {
             val led = LedController()
@@ -68,15 +71,19 @@ object ColorWaveAnimator {
                 try {
                     Thread.sleep(30)
                 } catch (e: InterruptedException) {
+                    Log.d(TAG, "Wave thread interrupted")
                     break
                 }
             }
 
+            Log.d(TAG, "RGB Wave Ended. Restoring base state...")
             LedStateManager.restoreBaseState(context)
         }
     }
 
     fun stop(context: Context) {
+        if (!isRunning) return
+        Log.d(TAG, "RGB Wave Stopping requested")
         isRunning = false
         waveThread?.interrupt()
         waveThread = null

@@ -9,7 +9,6 @@ import android.widget.Button
 import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
-
     private val TAG = "OnyxLED_Main"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "Requesting READ_PHONE_STATE permission")
             requestPermissions(arrayOf(android.Manifest.permission.READ_PHONE_STATE), 101)
         }
 
@@ -27,8 +27,10 @@ class MainActivity : AppCompatActivity() {
 
         btnRgbWave.setOnClickListener {
             if (!ColorWaveAnimator.isWaveActive()) {
+                Log.d(TAG, "RGB Wave Toggle -> Start")
                 ColorWaveAnimator.start(applicationContext)
             } else {
+                Log.d(TAG, "RGB Wave Toggle -> Stop")
                 ColorWaveAnimator.stop(applicationContext)
             }
             updateWaveButtonState(btnRgbWave)
@@ -44,8 +46,7 @@ class MainActivity : AppCompatActivity() {
         val switchNotif = findViewById<Switch>(R.id.switchNotif)
 
         cardNotif.setOnClickListener {
-            val intent = android.content.Intent(this, NotificationSettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, NotificationSettingsActivity::class.java))
         }
 
         val prefs = getSharedPreferences("OnyxPrefs", MODE_PRIVATE)
@@ -53,11 +54,9 @@ class MainActivity : AppCompatActivity() {
 
         switchNotif.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("notif_enabled", isChecked).apply()
-            Log.d(TAG, "Notification LED feature status: $isChecked")
-
+            Log.d(TAG, "Notification LED master switch: $isChecked")
             LedStateManager.restoreBaseState(applicationContext)
         }
-
 
         val cardCharging = findViewById<LinearLayout>(R.id.cardChargingFeature)
         val switchCharging = findViewById<Switch>(R.id.switchCharging)
@@ -65,17 +64,16 @@ class MainActivity : AppCompatActivity() {
         switchCharging.isChecked = prefs.getBoolean("charging_enabled", false)
 
         cardCharging.setOnClickListener {
-            val intent = android.content.Intent(this, ChargingSettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, ChargingSettingsActivity::class.java))
         }
 
         switchCharging.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("charging_enabled", isChecked).apply()
-            Log.d(TAG, "Charging Status feature: $isChecked")
-
+            Log.d(TAG, "Charging LED master switch: $isChecked")
             LedStateManager.restoreBaseState(applicationContext)
         }
     }
+
     private fun updateWaveButtonState(button: Button) {
         if (ColorWaveAnimator.isWaveActive()) {
             button.text = "Disable RGB wave"

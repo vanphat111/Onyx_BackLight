@@ -3,6 +3,7 @@ package vn.vanphat111.onyxbacklight
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
-import android.app.Notification
-import android.os.Build
-import android.service.notification.StatusBarNotification
 
 class NotificationSettingsActivity : AppCompatActivity() {
+    private val TAG = "OnyxLED_NotifSettings"
 
     data class AppItem(val appName: String, val packageName: String, val icon: android.graphics.drawable.Drawable, var isSelected: Boolean, val isSystem: Boolean)
 
@@ -42,6 +41,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
         viewColorPreview.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.rgb(savedR, savedG, savedB))
 
         cbShowSystemApps.setOnCheckedChangeListener { _, isChecked ->
+            Log.d(TAG, "Show System Apps: $isChecked")
             loadApps(isChecked)
         }
 
@@ -81,8 +81,13 @@ class NotificationSettingsActivity : AppCompatActivity() {
             app.isSelected = !app.isSelected
             adapter.notifyDataSetChanged()
 
-            if (app.isSelected) allowedApps.add(app.packageName)
-            else allowedApps.remove(app.packageName)
+            if (app.isSelected) {
+                Log.d(TAG, "Added App to whitelist: ${app.packageName}")
+                allowedApps.add(app.packageName)
+            } else {
+                Log.d(TAG, "Removed App from whitelist: ${app.packageName}")
+                allowedApps.remove(app.packageName)
+            }
 
             prefs.edit().putStringSet("allowed_apps", allowedApps).apply()
         }
@@ -99,6 +104,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 lblBrightness.text = "LED Brightness: $progress"
                 if (fromUser) {
+                    Log.d(TAG, "Notif Brightness: $progress")
                     prefs.edit().putInt("notif_brightness", progress).apply()
                     LedController().sendCommand("BRIGHTNESS $progress")
                 }
@@ -132,7 +138,10 @@ class NotificationSettingsActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val count = progress + 1
                 lblBlinkCount.text = "Blink Count: $count times"
-                if (fromUser) prefs.edit().putInt("notif_blink_count", count).apply()
+                if (fromUser) {
+                    Log.d(TAG, "Notif Blink Count: $count")
+                    prefs.edit().putInt("notif_blink_count", count).apply()
+                }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -142,13 +151,17 @@ class NotificationSettingsActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val speed = progress * 50 + 100
                 lblBlinkSpeed.text = "Blink Speed (Delay): ${speed}ms"
-                if (fromUser) prefs.edit().putInt("notif_blink_speed", speed).apply()
+                if (fromUser) {
+                    Log.d(TAG, "Notif Blink Speed: ${speed}ms")
+                    prefs.edit().putInt("notif_blink_speed", speed).apply()
+                }
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         btnReset.setOnClickListener {
+            Log.d(TAG, "Restoring Default Notif Settings")
             prefs.edit()
                 .putInt("notif_blink_count", 3)
                 .putInt("notif_blink_speed", 400)
@@ -178,6 +191,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
         fun saveAndPreviewColor(r: Int, g: Int, b: Int) {
             val hex = String.format("0x%02X%02X%02X", r, g, b)
             val command = "FRAME $hex $hex $hex $hex"
+            Log.d(TAG, "Notif Color Selected: $command")
 
             prefs.edit()
                 .putInt("color_r", r)
@@ -252,6 +266,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
             val blinkCount = prefs.getInt("notif_blink_count", 3)
             val blinkSpeed = prefs.getInt("notif_blink_speed", 400).toLong()
 
+            Log.d(TAG, "Playing Normal Notif Demo: $colorCommand | Brightness: $brightness")
             Toast.makeText(this, "Playing Demo...", Toast.LENGTH_SHORT).show()
 
             kotlin.concurrent.thread {
@@ -266,31 +281,5 @@ class NotificationSettingsActivity : AppCompatActivity() {
                 LedStateManager.restoreBaseState(applicationContext)
             }
         }
-    }
-
-    private fun isGenericIncomingCall(sbn: StatusBarNotification): Boolean {
-        val notif = sbn.notification ?: return false
-        val extras = notif.extras ?: return false
-
-        val template = extras.getString(Notification.EXTRA_TEMPLATE) ?: ""
-        if (template.contains("CallStyle", ignoreCase = true)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val callType = extras.getInt(Notification.EXTRA_CALL_TYPE, -1)
-                if (callType == Notification.CallStyle.CALL_TYPE_INCOMING) {
-                    return true
-                }
-            } else {
-                return true
-            }
-        }
-
-        val isCallCategory = notif.category == Notification.CATEGORY_CALL
-
-        val isOngoing = (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0
-        val isInsistent = (notif.flags and Notification.FLAG_INSISTENT) != 0
-
-        val hasFullScreenIntent = notif.fullScreenIntent != null
-
-        return isCallCategory && (hasFullScreenIntent || isInsistent || isOngoing)
     }
 }

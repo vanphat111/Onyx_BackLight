@@ -37,6 +37,7 @@ class OnyxNotificationService : NotificationListenerService() {
             if (powerReceiver == null) {
                 powerReceiver = object : BroadcastReceiver() {
                     override fun onReceive(context: Context?, intent: Intent?) {
+                        Log.d(TAG, "Power Event: ${intent?.action}")
                         context?.let { LedStateManager.restoreBaseState(it) }
                     }
                 }
@@ -103,14 +104,14 @@ class OnyxNotificationService : NotificationListenerService() {
         Log.d(TAG, "Notif received from: ${sbn.packageName} | Category: ${notif.category} | isCall: $isCall")
 
         if (isCall) {
-            Log.d(TAG, ">>> INCOMING CALL DETECTED! Starting LED Animator...")
+            Log.d(TAG, ">>> INCOMING CALL DETECTED! Key: ${sbn.key}")
             activeCallKeys.add(sbn.key)
             CallLedAnimator.start(applicationContext)
             return
         }
 
         if (activeCallKeys.contains(sbn.key) && !isCall) {
-            Log.d(TAG, ">>> CALL ANSWERED / ENDED! Stopping LED Animator...")
+            Log.d(TAG, ">>> CALL ANSWERED / ENDED (State changed)! Key: ${sbn.key}")
             activeCallKeys.remove(sbn.key)
             if (activeCallKeys.isEmpty()) {
                 CallLedAnimator.stop(applicationContext)
@@ -118,7 +119,10 @@ class OnyxNotificationService : NotificationListenerService() {
             return
         }
 
-        if (CallLedAnimator.isRinging) return
+        if (CallLedAnimator.isRinging) {
+            Log.d(TAG, "Skipping normal notif blink: Call is currently ringing")
+            return
+        }
 
         val packageName = sbn.packageName
         val prefs = applicationContext.getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
@@ -134,12 +138,15 @@ class OnyxNotificationService : NotificationListenerService() {
         val blinkCount = prefs.getInt("notif_blink_count", 3)
         val blinkSpeed = prefs.getInt("notif_blink_speed", 400).toLong()
 
-        Log.d(TAG, "Target Notification Received from: $packageName | Blinks: $blinkCount | Speed: ${blinkSpeed}ms")
+        Log.d(TAG, "Target Normal Notif: $packageName | Blinks: $blinkCount | Delay: ${blinkSpeed}ms")
 
         thread {
             led.sendCommand("BRIGHTNESS $brightness")
             for (i in 1..blinkCount) {
-                if (CallLedAnimator.isRinging) break
+                if (CallLedAnimator.isRinging) {
+                    Log.d(TAG, "Blink interrupted by incoming call")
+                    break
+                }
                 led.sendCommand(colorCommand)
                 Thread.sleep(blinkSpeed)
                 led.sendCommand("OFF")
@@ -154,6 +161,7 @@ class OnyxNotificationService : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
         if (sbn == null) return
         if (activeCallKeys.remove(sbn.key)) {
+            Log.d(TAG, "Call Notification REMOVED: ${sbn.key}")
             if (activeCallKeys.isEmpty()) {
                 CallLedAnimator.stop(applicationContext)
             }

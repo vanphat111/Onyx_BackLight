@@ -4,18 +4,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.util.Log
 import java.util.concurrent.Executors
 
 object LedStateManager {
+    private const val TAG = "OnyxLED_State"
     private val led = LedController()
     var isCameraBlocking = false
     private val executor = Executors.newSingleThreadExecutor()
 
     fun restoreBaseState(context: Context) {
         executor.submit {
-            if (ColorWaveAnimator.isWaveActive() || CallLedAnimator.isRinging) {
+            if (ColorWaveAnimator.isWaveActive()) {
+                Log.d(TAG, "restoreBaseState skipped: RGB Wave is active")
                 return@submit
             }
+            if (CallLedAnimator.isRinging) {
+                Log.d(TAG, "restoreBaseState skipped: Call Ringing is active")
+                return@submit
+            }
+
             val prefs = context.getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
             val isChargingEnabled = prefs.getBoolean("charging_enabled", false)
 
@@ -38,12 +46,15 @@ object LedStateManager {
                         else -> prefs.getString("charge_med_cmd", "FRAME 0xFFFF00 0xFFFF00 0xFFFF00 0xFFFF00")!!
                     }
 
+                    Log.d(TAG, "Restoring Charging State: $batteryPct% | Brightness: $chargeBrightness | CMD: $chargeColorCmd")
                     led.resetForStatic()
                     led.sendCommand("BRIGHTNESS $chargeBrightness")
                     led.sendCommand(chargeColorCmd)
                     return@submit
                 }
             }
+
+            Log.d(TAG, "Restoring Default State: LED OFF")
             led.resetAndOff()
         }
     }

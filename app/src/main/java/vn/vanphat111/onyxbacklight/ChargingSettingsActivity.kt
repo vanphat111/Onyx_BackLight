@@ -2,6 +2,7 @@ package vn.vanphat111.onyxbacklight
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.SeekBar
@@ -11,7 +12,7 @@ import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
 class ChargingSettingsActivity : AppCompatActivity() {
-
+    private val TAG = "OnyxLED_ChargeSettings"
     private lateinit var prefs: android.content.SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,9 +21,9 @@ class ChargingSettingsActivity : AppCompatActivity() {
 
         prefs = getSharedPreferences("OnyxPrefs", Context.MODE_PRIVATE)
 
-        setupLedStage("Low", listOf(R.id.low1, R.id.low2, R.id.low3, R.id.low4), "low", "charge_low_cmd", "0xFF0000") // Mặc định Đỏ
-        setupLedStage("Medium", listOf(R.id.med1, R.id.med2, R.id.med3, R.id.med4), "med", "charge_med_cmd", "0xFFFF00") // Mặc định Vàng
-        setupLedStage("Full", listOf(R.id.full1, R.id.full2, R.id.full3, R.id.full4), "full", "charge_full_cmd", "0x00FF00") // Mặc định Xanh Lá
+        setupLedStage("Low", listOf(R.id.low1, R.id.low2, R.id.low3, R.id.low4), "low", "charge_low_cmd", "0xFF0000")
+        setupLedStage("Medium", listOf(R.id.med1, R.id.med2, R.id.med3, R.id.med4), "med", "charge_med_cmd", "0xFFFF00")
+        setupLedStage("Full", listOf(R.id.full1, R.id.full2, R.id.full3, R.id.full4), "full", "charge_full_cmd", "0x00FF00")
 
         setupBrightnessControl()
         setupActionButtons()
@@ -52,6 +53,7 @@ class ChargingSettingsActivity : AppCompatActivity() {
             }
 
             val cmd = "FRAME ${colors[0]} ${colors[1]} ${colors[2]} ${colors[3]}"
+            Log.d(TAG, "Stage $stageName Updated: $cmd")
 
             prefs.edit().apply {
                 putString("charge_${prefPrefix}_c1", colors[0])
@@ -64,8 +66,9 @@ class ChargingSettingsActivity : AppCompatActivity() {
 
             val brightness = prefs.getInt("charging_brightness", 128)
             kotlin.concurrent.thread {
-                LedController().sendCommand("BRIGHTNESS $brightness")
-                LedController().sendCommand(cmd)
+                val led = LedController()
+                led.sendCommand("BRIGHTNESS $brightness")
+                led.sendCommand(cmd)
             }
         }
 
@@ -108,6 +111,7 @@ class ChargingSettingsActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 lblBrightness.text = "Charging Brightness: $progress"
                 if (fromUser) {
+                    Log.d(TAG, "Charging Brightness Changed: $progress")
                     prefs.edit().putInt("charging_brightness", progress).apply()
                     LedController().sendCommand("BRIGHTNESS $progress")
                 }
@@ -119,6 +123,7 @@ class ChargingSettingsActivity : AppCompatActivity() {
 
     private fun setupActionButtons() {
         findViewById<Button>(R.id.btnDemoCharge).setOnClickListener {
+            Log.d(TAG, "Demo Charge Clicked")
             (it as Button).text = "Running Color Wave..."
 
             kotlin.concurrent.thread {
@@ -126,13 +131,7 @@ class ChargingSettingsActivity : AppCompatActivity() {
                 led.sendCommand("BRIGHTNESS 200")
 
                 val colors = listOf(
-                    0xFF0000,
-                    0xFFFF00,
-                    0x00FF00,
-                    0x00FFFF,
-                    0x0000FF,
-                    0xFF00FF,
-                    0xFF0000
+                    0xFF0000, 0xFFFF00, 0x00FF00, 0x00FFFF, 0x0000FF, 0xFF00FF, 0xFF0000
                 )
 
                 fun interpolateColor(c1: Int, c2: Int, fraction: Float): Int {
@@ -160,7 +159,6 @@ class ChargingSettingsActivity : AppCompatActivity() {
                 val totalSteps = 150
                 for (step in 0..totalSteps) {
                     val baseProgress = step.toFloat() / 25f
-
                     val p1 = baseProgress
                     val p2 = baseProgress + 0.25f
                     val p3 = baseProgress + 0.50f
@@ -181,6 +179,7 @@ class ChargingSettingsActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.btnTurnOff).setOnClickListener {
+            Log.d(TAG, "Turn Off Clicked")
             kotlin.concurrent.thread { LedController().sendCommand("OFF") }
         }
     }
