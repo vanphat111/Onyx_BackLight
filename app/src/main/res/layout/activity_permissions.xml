@@ -20,7 +20,7 @@
         android:id="@+id/btnReqRoot"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="1. GRANT ROOT ACCESS (KERNELSU)"
+        android:text="GRANT ROOT ACCESS (KERNELSU)"
         android:backgroundTint="#444444"
         android:layout_marginBottom="12dp" />
 
@@ -28,7 +28,7 @@
         android:id="@+id/btnReqNotif"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="2. NOTIFICATION ACCESS"
+        android:text="NOTIFICATION ACCESS"
         android:backgroundTint="#444444"
         android:layout_marginBottom="12dp" />
 
@@ -36,7 +36,7 @@
         android:id="@+id/btnReqBattery"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="3. DISABLE BATTERY SAVER"
+        android:text="DISABLE BATTERY SAVER"
         android:backgroundTint="#444444"
         android:layout_marginBottom="12dp" />
 
@@ -44,7 +44,7 @@
         android:id="@+id/btnReqAutoStart"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:text="4. ENABLE AUTO-START (HYPEROS)"
+        android:text="ENABLE AUTO-START (HYPEROS)"
         android:backgroundTint="#444444"
         android:layout_marginBottom="32dp" />
 
