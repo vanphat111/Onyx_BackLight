@@ -14,10 +14,6 @@ class LedController {
     private val SOCKET_NAME = "onyx_led_abstract"
     private val TAG = "OnyxLED_HAL"
 
-    companion object {
-        val suLock = Any()
-    }
-
     fun resetForStatic() {
         sendCommand("RUN 0")
         sendCommand("EFFECT 0")

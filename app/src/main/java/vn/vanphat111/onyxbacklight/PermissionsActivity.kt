@@ -8,18 +8,15 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import kotlin.concurrent.thread
 
 class PermissionsActivity : AppCompatActivity() {
 
     private val TAG = "OnyxLED_Perms"
-    private lateinit var btnRoot: Button
+    private var btnRoot: Button? = null
     private lateinit var btnNotif: Button
     private lateinit var btnBattery: Button
     private lateinit var btnAutoStart: Button
@@ -40,6 +37,8 @@ class PermissionsActivity : AppCompatActivity() {
 
     private fun initViews() {
         btnRoot = findViewById(R.id.btnReqRoot)
+        btnRoot?.visibility = View.GONE
+
         btnNotif = findViewById(R.id.btnReqNotif)
         btnBattery = findViewById(R.id.btnReqBattery)
         btnAutoStart = findViewById(R.id.btnReqAutoStart)
@@ -47,10 +46,6 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun setupButtons() {
-        btnRoot.setOnClickListener {
-            Toast.makeText(this, "Grant Root in KernelSU, then FORCE STOP this app and reopen!", Toast.LENGTH_LONG).show()
-        }
-
         btnNotif.setOnClickListener {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
         }
@@ -88,75 +83,39 @@ class PermissionsActivity : AppCompatActivity() {
         val notifOk = hasNotificationAccess()
         val batteryOk = hasBatteryIgnored()
 
-        thread {
-            val rootOk = hasRoot()
+        Log.d(TAG, "Permissions status - Notif: $notifOk, Battery: $batteryOk")
 
-            runOnUiThread {
-                if (rootOk) {
-                    btnRoot.backgroundTintList = android.content.res.ColorStateList.valueOf(colorSuccess)
-                    btnRoot.isEnabled = true
+        btnNotif.isEnabled = true
+        btnNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(if (notifOk) colorSuccess else colorPending)
 
-                    btnNotif.isEnabled = true
-                    btnNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(if (notifOk) colorSuccess else colorPending)
+        if (notifOk) {
+            btnBattery.isEnabled = true
+            btnBattery.backgroundTintList = android.content.res.ColorStateList.valueOf(if (batteryOk) colorSuccess else colorPending)
 
-                    if (notifOk) {
-                        btnBattery.isEnabled = true
-                        btnBattery.backgroundTintList = android.content.res.ColorStateList.valueOf(if (batteryOk) colorSuccess else colorPending)
+            if (batteryOk) {
+                btnAutoStart.isEnabled = true
+                btnAutoStart.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPending)
 
-                        if (batteryOk) {
-                            btnAutoStart.isEnabled = true
-                            btnAutoStart.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPending)
+                btnContinue.isEnabled = true
+                btnContinue.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2196F3"))
 
-                            btnContinue.isEnabled = true
-                            btnContinue.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2196F3"))
-
-                            Log.d(TAG, "Sequence COMPLETE. Launching MainActivity.")
-                            startActivity(Intent(this@PermissionsActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            disableButton(btnAutoStart, colorDisabled)
-                            disableButton(btnContinue, colorDisabled)
-                        }
-                    } else {
-                        disableButton(btnBattery, colorDisabled)
-                        disableButton(btnAutoStart, colorDisabled)
-                        disableButton(btnContinue, colorDisabled)
-                    }
-                } else {
-                    btnRoot.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPending)
-                    btnRoot.isEnabled = true
-
-                    disableButton(btnNotif, colorDisabled)
-                    disableButton(btnBattery, colorDisabled)
-                    disableButton(btnAutoStart, colorDisabled)
-                    disableButton(btnContinue, colorDisabled)
-                }
+                Log.d(TAG, "Sequence COMPLETE. Launching MainActivity.")
+                startActivity(Intent(this@PermissionsActivity, MainActivity::class.java))
+                finish()
+            } else {
+                disableButton(btnAutoStart, colorDisabled)
+                disableButton(btnContinue, colorDisabled)
             }
+        } else {
+            disableButton(btnBattery, colorDisabled)
+            disableButton(btnAutoStart, colorDisabled)
+            disableButton(btnContinue, colorDisabled)
         }
     }
 
     private fun disableButton(button: Button, color: Int) {
         button.isEnabled = false
         button.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
-    }
-
-    private fun hasRoot(): Boolean {
-        synchronized(LedController.suLock) {
-            return try {
-                val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                val output = reader.readLine()
-                process.waitFor()
-                process.destroy()
-
-                val isRoot = output != null && output.contains("uid=0(root)")
-                Log.d(TAG, "hasRoot check result: $isRoot")
-                isRoot
-            } catch (e: Exception) {
-                Log.e(TAG, "hasRoot check failed: ${e.message}")
-                false
-            }
-        }
     }
 
     private fun hasNotificationAccess(): Boolean {
