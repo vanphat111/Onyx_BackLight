@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_permissions_screen"
     android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -10,25 +11,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="@dimen/app_padding">
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_gravity="left"
+            android:layout_marginTop="-120dp"
+            android:background="@drawable/bg_logo_orb"
+            android:gravity="center"
+            android:text="&#10022;"
+            android:textColor="#BDEBFF"
+            android:textSize="27sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-45dp"
+            android:layout_marginBottom="150dp"
             android:text="Onyx LED Controller"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp" />
+            android:textColor="#F6F8FF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/cardNotifFeature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/bg_surface"
-            android:padding="16dp"
+            android:background="@drawable/bg_main_card"
+            android:padding="20dp"
+            android:minHeight="88dp"
             android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:clickable="true"
@@ -44,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Notification LED"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#F4F7FF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -52,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tap to configure apps, colors &amp; brightness"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#9AA8C5"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
@@ -60,7 +78,9 @@
             <Switch
                 android:id="@+id/switchNotif"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:thumbTint="@color/switch_thumb_tint"
+                android:trackTint="@color/switch_track_tint" />
         </LinearLayout>
 
         <LinearLayout
@@ -68,8 +88,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/bg_surface"
-            android:padding="16dp"
+            android:background="@drawable/bg_main_card"
+            android:padding="20dp"
+            android:minHeight="88dp"
             android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:clickable="true"
@@ -85,7 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Charging Status LED"
-                    android:textColor="@color/text_primary"
+                    android:textColor="#F4F7FF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -93,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tap to select presets &amp; custom animations"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#9AA8C5"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
             </LinearLayout>
@@ -101,33 +122,41 @@
             <Switch
                 android:id="@+id/switchCharging"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:thumbTint="@color/switch_thumb_tint"
+                android:trackTint="@color/switch_track_tint" />
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRgbWaveToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="🌀 Enable RGB Wave"
-            android:backgroundTint="@color/bg_surface"
-            android:textColor="@color/text_primary"
+            android:textColor="#F4F7FF"
             android:textSize="16sp"
             android:gravity="start|center_vertical"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
+            android:paddingEnd="16dp"
+            app:backgroundTint="#202B47"
+            app:cornerRadius="28dp"
+            app:strokeColor="#526487"
+            app:strokeWidth="1dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCallSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Incoming Call LED Settings"
-            android:backgroundTint="@color/bg_surface"
-            android:textColor="@color/text_primary"
+            android:textColor="#F4F7FF"
             android:textSize="16sp"
             android:gravity="start|center_vertical"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
+            android:paddingEnd="16dp"
+            app:backgroundTint="#202B47"
+            app:cornerRadius="28dp"
+            app:strokeColor="#526487"
+            app:strokeWidth="1dp" />
 
     </LinearLayout>
 </FrameLayout>

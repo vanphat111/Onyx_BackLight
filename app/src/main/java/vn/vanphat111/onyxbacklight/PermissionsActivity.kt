@@ -8,19 +8,17 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
-import android.view.View
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import com.google.android.material.button.MaterialButton
 
 class PermissionsActivity : AppCompatActivity() {
 
     private val TAG = "OnyxLED_Perms"
-    private var btnRoot: Button? = null
-    private lateinit var btnNotif: Button
-    private lateinit var btnBattery: Button
-    private lateinit var btnAutoStart: Button
-    private lateinit var btnContinue: Button
+    private lateinit var btnNotif: MaterialButton
+    private lateinit var btnBattery: MaterialButton
+    private lateinit var btnAutoStart: MaterialButton
+    private lateinit var btnContinue: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +34,6 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnRoot = findViewById(R.id.btnReqRoot)
-        btnRoot?.visibility = View.GONE
-
         btnNotif = findViewById(R.id.btnReqNotif)
         btnBattery = findViewById(R.id.btnReqBattery)
         btnAutoStart = findViewById(R.id.btnReqAutoStart)
@@ -76,46 +71,56 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun enforcePermissionSequence() {
-        val colorSuccess = android.graphics.Color.parseColor("#00FF00")
-        val colorPending = android.graphics.Color.parseColor("#444444")
-        val colorDisabled = android.graphics.Color.parseColor("#1A1A1A")
-
         val notifOk = hasNotificationAccess()
         val batteryOk = hasBatteryIgnored()
 
         Log.d(TAG, "Permissions status - Notif: $notifOk, Battery: $batteryOk")
 
-        btnNotif.isEnabled = true
-        btnNotif.backgroundTintList = android.content.res.ColorStateList.valueOf(if (notifOk) colorSuccess else colorPending)
+        setPermissionStyle(btnNotif, notifOk, true)
 
-        if (notifOk) {
-            btnBattery.isEnabled = true
-            btnBattery.backgroundTintList = android.content.res.ColorStateList.valueOf(if (batteryOk) colorSuccess else colorPending)
+        val batteryAvailable = notifOk
+        setPermissionStyle(btnBattery, batteryOk, batteryAvailable)
 
-            if (batteryOk) {
-                btnAutoStart.isEnabled = true
-                btnAutoStart.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPending)
+        val autoStartAvailable = notifOk && batteryOk
+        setPermissionStyle(btnAutoStart, false, autoStartAvailable)
 
-                btnContinue.isEnabled = true
-                btnContinue.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2196F3"))
+        btnContinue.isEnabled = autoStartAvailable
+        btnContinue.alpha = if (autoStartAvailable) 1f else 0.42f
 
-                Log.d(TAG, "Sequence COMPLETE. Launching MainActivity.")
-                startActivity(Intent(this@PermissionsActivity, MainActivity::class.java))
-                finish()
-            } else {
-                disableButton(btnAutoStart, colorDisabled)
-                disableButton(btnContinue, colorDisabled)
-            }
-        } else {
-            disableButton(btnBattery, colorDisabled)
-            disableButton(btnAutoStart, colorDisabled)
-            disableButton(btnContinue, colorDisabled)
+        if (autoStartAvailable) {
+            Log.d(TAG, "Required permissions granted; opening MainActivity")
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
-    private fun disableButton(button: Button, color: Int) {
-        button.isEnabled = false
-        button.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
+    private fun setPermissionStyle(
+        button: MaterialButton,
+        completed: Boolean,
+        available: Boolean
+    ) {
+        val background = when {
+            completed -> "#254E4C" // soft green: completed
+            available -> "#202B47" // blue glass card: ready
+            else -> "#151C2E"      // dark muted: locked
+        }
+
+        val stroke = when {
+            completed -> "#70E1D0"
+            available -> "#526487"
+            else -> "#303B55"
+        }
+
+        button.isEnabled = available || completed
+        button.alpha = if (available || completed) 1f else 0.45f
+        button.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(
+                android.graphics.Color.parseColor(background)
+            )
+        button.strokeColor =
+            android.content.res.ColorStateList.valueOf(
+                android.graphics.Color.parseColor(stroke)
+            )
     }
 
     private fun hasNotificationAccess(): Boolean {
